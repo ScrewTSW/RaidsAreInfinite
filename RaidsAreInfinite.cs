@@ -1,38 +1,38 @@
-using SPTarkov.Common.Models.Logging;
+using SPTarkov.Server.Core.Models.Utils;
 using SPTarkov.DI.Annotations;
 using SPTarkov.Server.Core.DI;
 using SPTarkov.Server.Core.Models.Spt.Mod;
-using SPTarkov.Server.Core.Models.Spt.Tables;
+using SPTarkov.Server.Core.Models.Spt.Server;
 
 namespace RaidsAreInfinite;
 
-public record ModMetadata : IModMetadata
+public record ModMetadata : AbstractModMetadata
 {
-    public string ModGuid { get; init; } = "eu.thescrewcollab.raidsareinfinite";
-    public string Name { get; init; } = "RaidsAreInfinite";
-    public string Author { get; init; } = "ScrewTSW";
-    public List<string>? Contributors { get; init; }
-    public SemanticVersioning.Version Version { get; init; } = new("1.0.0");
-    public SemanticVersioning.Range SptVersion { get; init; } = new("~4.1.0");
-    public bool HasPrepatcher { get; init; } = false;
-    public List<string>? Incompatibilities { get; init; }
-    public Dictionary<string, SemanticVersioning.Range>? ModDependencies { get; init; }
-    public string? Url { get; init; }
-    public string License { get; init; } = "MIT";
+    public override string ModGuid { get; init; } = "eu.thescrewcollab.raidsareinfinite";
+    public override string Name { get; init; } = "RaidsAreInfinite";
+    public override string Author { get; init; } = "ScrewTSW";
+    public override List<string>? Contributors { get; init; }
+    public override SemanticVersioning.Version Version { get; init; } = new("1.0.0");
+    public override SemanticVersioning.Range SptVersion { get; init; } = new("~4.0.0");
+    public override List<string>? Incompatibilities { get; init; }
+    public override Dictionary<string, SemanticVersioning.Range>? ModDependencies { get; init; }
+    public override bool? IsBundleMod { get; init; } = false;
+    public override string? Url { get; init; }
+    public override string License { get; init; } = "MIT";
 }
 
-[Injectable(TypePriority = OnLoadOrder.PostLoad + 1)]
+[Injectable(TypePriority = OnLoadOrder.PostDBModLoader + 1)]
 public class RaidsAreInfinite(
-    LocationTable locationTable,
+    DatabaseTables databaseTables,
     ISptLogger<RaidsAreInfinite> logger) : IOnLoad
 {
     private const int TimeLimit = 99999;
 
-    public Task OnLoadAsync(CancellationToken cancellationToken)
+    public Task OnLoad()
     {
         var patched = 0;
 
-        foreach (var (name, location) in locationTable.GetDictionary())
+        foreach (var (name, location) in databaseTables.Locations.GetDictionary())
         {
             if (location?.Base == null) continue;
 
