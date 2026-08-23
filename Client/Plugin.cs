@@ -6,7 +6,7 @@ using HarmonyLib;
 
 namespace RaidsAreInfinite.Client;
 
-[BepInPlugin("eu.thescrewcollab.raidsareinfinite.client", "RaidsAreInfinite.Client", "1.0.0")]
+[BepInPlugin("eu.thescrewcollab.raidsareinfinite.client", "RaidsAreInfinite.Client", "1.1.0")]
 public class Plugin : BaseUnityPlugin
 {
     public static ManualLogSource Log;
