@@ -8,6 +8,14 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <!-- Client/ is a separate BepInEx plugin built by Client/RaidsAreInfinite.Client.csproj.
+         The SDK's implicit glob would otherwise compile it into the server mod, where
+         Harmony and the EFT assemblies are not referenced. -->
+    <Compile Remove="Client/**" />
+    <Content Remove="Client/**" />
+    <None Remove="Client/**" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="SPTarkov.Common" Version="4.1.2" />
     <PackageReference Include="SPTarkov.DI" Version="4.1.2" />
     <PackageReference Include="SPTarkov.Server.Core" Version="4.1.2" />
