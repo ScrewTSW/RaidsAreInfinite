@@ -1,7 +1,6 @@
 using System;
 using EFT;
 using EFT.UI.Matchmaker;
-using EFT.Utilities;
 using HarmonyLib;
 using JsonType;
 

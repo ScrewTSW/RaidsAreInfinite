@@ -1,4 +1,5 @@
 using System;
+using EFT;
 using EFT.UI.BattleTimer;
 using HarmonyLib;
 
@@ -52,7 +53,16 @@ public static class RaidTimerPatch
         try
         {
             TimeSpan countdown = timeSpan;
-            timeSpan = DateTime.Now.TimeOfDay;
+
+            // Show the RAID clock, not DateTime.Now. The raid starts at the host's selected
+            // time (which may be system time -12h for a night raid) and Fika syncs that one
+            // GameDateTime to every client, so this is the value that matches the sky and is
+            // identical on all machines. Rendering the local system clock instead made a 15:32
+            // daytime raid display 03:36, and made two players agree only because their PCs
+            // happened to share a timezone.
+            var world = Comfort.Common.Singleton<GameWorld>.Instance;
+            var raidClock = world?.GameDateTime;
+            timeSpan = raidClock != null ? raidClock.Calculate().TimeOfDay : DateTime.Now.TimeOfDay;
 
             if (Plugin.EnableLogging.Value &&
                 UnityEngine.Time.unscaledTime - _lastTrace >= Plugin.LogIntervalSeconds.Value)
@@ -60,7 +70,9 @@ public static class RaidTimerPatch
                 _lastTrace = UnityEngine.Time.unscaledTime;
                 // countdown= is what vanilla would have rendered; a value that keeps shrinking
                 // toward zero means the infinite-raid patch is not holding.
-                Plugin.Trace($"timer: wrote {timeSpan:hh\\:mm\\:ss} (vanilla countdown={countdown})");
+                Plugin.Trace($"timer: [{FikaRole.Describe()}] wrote {timeSpan:hh\\:mm\\:ss} " +
+                             $"(raidClock={(raidClock != null ? "yes" : "NO-fallback-to-system")}, " +
+                             $"system={DateTime.Now:HH:mm:ss}, vanilla countdown={countdown})");
             }
         }
         catch (Exception e)
